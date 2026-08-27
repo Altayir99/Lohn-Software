@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "lohnpro": {
+      "command": "python",
+      "args": ["c:/Users/firas/Documents/GitHub/pdf/lohnpro_mcp_server.py"],
+      "env": {}
+    }
+  }
+}

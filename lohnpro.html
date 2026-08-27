@@ -1,0 +1,966 @@
+﻿<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LohnPRO 2026 – Offline</title>
+<style>
+/* OFFLINE FONTS - System Font Stack */
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+  --font-serif: Georgia, 'Times New Roman', serif;
+}
+</style>
+<style>
+:root{--ink:#1a1714;--paper:#f5f0e8;--cream:#ede8dc;--warm:#d4c9b0;--accent:#c84b2f;--accent2:#2f6bc8;--gold:#b8962e;--green:#2a6b3f;--muted:#6b6459;--border:#c8bfaf;--card:#faf7f2;--sh:rgba(26,23,20,.07);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-sans);min-height:100vh;}
+.app{display:grid;grid-template-columns:255px 1fr;min-height:100vh;}
+@media(max-width:800px){.app{grid-template-columns:1fr;}}
+
+/* SIDEBAR */
+.sb{background:var(--ink);color:var(--paper);padding:1.4rem;display:flex;flex-direction:column;gap:1rem;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.logo{font-family:var(--font-serif);font-size:1.45rem;font-weight:700;color:#fff;letter-spacing:-.02em;}
+.logo em{color:var(--accent);font-style:italic;}
+.logo-sub{font-family:var(--font-mono);font-size:.6rem;color:rgba(255,255,255,.28);letter-spacing:.14em;text-transform:uppercase;margin-top:.15rem;}
+.hr{border:none;border-top:1px solid rgba(255,255,255,.1);margin:.1rem 0;}
+.nl{font-family:var(--font-mono);font-size:.58rem;color:rgba(255,255,255,.28);letter-spacing:.13em;text-transform:uppercase;margin-bottom:.35rem;}
+.nb{width:100%;background:transparent;border:none;color:rgba(255,255,255,.65);padding:.5rem .7rem;border-radius:6px;font-family:var(--font-sans);font-size:.83rem;cursor:pointer;text-align:left;transition:all .14s;display:flex;align-items:center;gap:.55rem;}
+.nb:hover{background:rgba(255,255,255,.08);color:#fff;}
+.nb.on{background:var(--accent);color:#fff;font-weight:600;}
+.emp-list{display:flex;flex-direction:column;gap:.28rem;flex:1;overflow-y:auto;}
+.emp-item{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:.55rem .7rem;cursor:pointer;transition:all .14s;position:relative;}
+.emp-item:hover{background:rgba(255,255,255,.1);}
+.emp-item.on{background:rgba(200,75,47,.25);border-color:var(--accent);}
+.emp-name{font-size:.82rem;font-weight:500;color:#fff;}
+.emp-meta{font-family:var(--font-mono);font-size:.6rem;color:rgba(255,255,255,.38);margin-top:.12rem;}
+.emp-del{position:absolute;top:.35rem;right:.5rem;background:transparent;border:none;color:rgba(255,255,255,.18);cursor:pointer;font-size:.75rem;}
+.emp-del:hover{color:var(--accent);}
+.add-btn{width:100%;background:transparent;border:1.5px dashed rgba(255,255,255,.18);color:rgba(255,255,255,.4);padding:.55rem;border-radius:7px;font-family:var(--font-sans);font-size:.8rem;cursor:pointer;transition:all .14s;}
+.add-btn:hover{border-color:rgba(255,255,255,.45);color:#fff;}
+
+/* MAIN */
+.main{padding:1.8rem;overflow-y:auto;}
+.page{display:none;}.page.on{display:block;}
+.ph{margin-bottom:1.6rem;}
+.pt{font-family:var(--font-serif);font-size:1.9rem;font-weight:700;letter-spacing:-.03em;}
+.ps{font-family:var(--font-mono);font-size:.67rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:.25rem;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;}
+@media(max-width:950px){.g2,.g3{grid-template-columns:1fr;}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:1.2rem;}
+.ct{font-family:var(--font-mono);font-size:.62rem;color:var(--muted);letter-spacing:.11em;text-transform:uppercase;margin-bottom:.9rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);}
+.field{margin-bottom:.8rem;}
+label{display:block;font-size:.73rem;color:var(--muted);margin-bottom:.28rem;font-weight:500;}
+input,select{width:100%;background:#fff;border:1.5px solid var(--border);color:var(--ink);border-radius:7px;padding:.44rem .7rem;font-size:.86rem;font-family:var(--font-sans);transition:border-color .14s;}
+input:focus,select:focus{outline:none;border-color:var(--accent2);}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.65rem;}
+.hint{font-size:.68rem;color:var(--muted);margin-top:.2rem;font-style:italic;}
+.btn{padding:.6rem 1.3rem;border:none;border-radius:7px;font-family:var(--font-sans);font-size:.86rem;font-weight:600;cursor:pointer;transition:all .14s;display:inline-flex;align-items:center;gap:.45rem;}
+.btn-p{background:var(--accent);color:#fff;}.btn-p:hover{opacity:.87;transform:translateY(-1px);}
+.btn-s{background:transparent;border:1.5px solid var(--border);color:var(--ink);}.btn-s:hover{border-color:var(--ink);}
+.btn-pdf{background:var(--accent2);color:#fff;}.btn-pdf:hover{opacity:.87;transform:translateY(-1px);}
+.btn-json{background:var(--green);color:#fff;}.btn-json:hover{opacity:.87;transform:translateY(-1px);}
+.brow{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.1rem;}
+
+/* RESULT */
+.rh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.4rem;}
+.rgross{font-family:var(--font-serif);font-size:2.3rem;font-weight:700;}
+.rnet{font-family:var(--font-serif);font-size:1.9rem;font-weight:600;color:var(--green);}
+.rl{font-family:var(--font-mono);font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+
+/* TABLE */
+.at{width:100%;border-collapse:collapse;font-size:.83rem;}
+.at th{background:var(--ink);color:var(--paper);padding:.48rem .75rem;text-align:left;font-size:.67rem;font-family:var(--font-mono);letter-spacing:.07em;text-transform:uppercase;}
+.at th:last-child,.at td:last-child{text-align:right;}
+.at td{padding:.4rem .75rem;border-bottom:1px solid var(--border);}
+.at tr:nth-child(even) td{background:var(--cream);}
+.sh-row td{background:var(--warm)!important;font-weight:600;font-size:.67rem;font-family:var(--font-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:.48rem .75rem .28rem;}
+.sub-row td{background:var(--warm)!important;font-weight:700;border-top:2px solid var(--border);border-bottom:2px solid var(--border);}
+.tot-row td{background:var(--ink)!important;color:var(--paper)!important;font-weight:700;font-size:.93rem;padding:.65rem .75rem;}
+
+/* SV */
+.svg{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;margin-top:1.1rem;}
+@media(max-width:650px){.svg{grid-template-columns:1fr 1fr;}}
+.svb{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.75rem;text-align:center;}
+.svbl{font-family:var(--font-mono);font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.28rem;}
+.svba{font-weight:700;font-size:.88rem;}
+.svbag{font-size:.7rem;color:var(--muted);margin-top:.12rem;}
+.svbt{font-weight:600;font-size:.73rem;color:var(--accent2);margin-top:.08rem;}
+
+/* KUM */
+.kt{width:100%;border-collapse:collapse;font-size:.76rem;}
+.kt th{background:var(--ink);color:var(--paper);padding:.42rem .65rem;text-align:right;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;}
+.kt th:first-child{text-align:left;}
+.kt td{padding:.36rem .65rem;border-bottom:1px solid var(--border);text-align:right;}
+.kt td:first-child{text-align:left;font-weight:500;}
+.kt tr:nth-child(even) td{background:var(--cream);}
+.kt .cur td{background:rgba(200,75,47,.07)!important;border-left:3px solid var(--accent);}
+.kt .ges td{background:var(--warm)!important;font-weight:700;border-top:2px solid var(--border);}
+
+/* STAT */
+.stc{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:1.1rem;}
+.stv{font-family:var(--font-serif);font-size:1.5rem;font-weight:700;letter-spacing:-.02em;}
+.stl{font-family:var(--font-mono);font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:.18rem;}
+
+/* BADGES */
+.pap-badge{display:inline-block;background:var(--green);color:#fff;font-family:var(--font-mono);font-size:.58rem;padding:.15rem .45rem;border-radius:3px;letter-spacing:.07em;margin-left:.45rem;vertical-align:middle;}
+.badge-gold{background:var(--gold);color:#fff;font-family:var(--font-mono);font-size:.58rem;padding:.12rem .38rem;border-radius:3px;}
+
+.info-b{background:#eef4ff;border:1px solid #b8d0f5;border-radius:7px;padding:.7rem .9rem;font-size:.76rem;color:#1e4880;line-height:1.65;margin-top:.75rem;}
+.warn-b{background:#fff8ec;border:1px solid #f0c97a;border-radius:7px;padding:.7rem .9rem;font-size:.76rem;color:#7a4800;line-height:1.65;margin-top:.75rem;}
+
+@media print{
+*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+.sb,.brow,.add-btn,.emp-del{display:none!important;}
+.app{display:block!important;grid-template-columns:1fr!important;}
+.main{padding:0!important;}
+.page{display:none!important;}
+#pg-ab{display:block!important;}
+.ph,.g2,.g3,.info-b,.pap-badge,.badge-gold{display:none!important;}
+#erg{display:block!important;margin-top:0!important;}
+#print-header{display:block!important;}
+.rh{margin-bottom:.7rem!important;}
+.card{border:1px solid #bbb!important;border-radius:0!important;padding:.6rem!important;box-shadow:none!important;margin-bottom:.6rem!important;}
+.at td,.at th{padding:.28rem .5rem!important;font-size:.71rem!important;}
+.svg{gap:.4rem!important;margin-top:.6rem!important;}
+.svb{padding:.5rem!important;}
+body{background:#fff!important;}
+@page{margin:10mm 14mm;size:A4 portrait;}
+}
+@media screen{#print-header{display:none!important;}}
+</style>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="LohnPRO 2026">
+<meta name="theme-color" content="#1a1714">
+<meta name="description" content="Lohnabrechnungs-Tool für Steuerfachangestellte - vollständig offline nutzbar">
+
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sb">
+  <div>
+    <div class="logo">Lohn<em>PRO</em></div>
+    <div class="logo-sub">Lehrgangs-Tool &middot; 2026</div>
+  </div>
+  <hr class="hr"/>
+  <div>
+    <div class="nl">Navigation</div>
+    <button class="nb on" onclick="goPage('ab')" id="nav-ab"><span>&#9633;</span> Abrechnung</button>
+    <button class="nb" onclick="goPage('kum')" id="nav-kum"><span>&#8721;</span> Kumuliert</button>
+    <button class="nb" onclick="goPage('cfg')" id="nav-cfg"><span>&#9670;</span> Einstellungen</button>
+  </div>
+  <hr class="hr"/>
+  <div style="flex:1;display:flex;flex-direction:column;gap:.55rem;min-height:0;">
+    <div class="nl">Mitarbeiter</div>
+    <div class="emp-list" id="emp-list"></div>
+    <button class="add-btn" onclick="addMA()">+ Mitarbeiter hinzuf&uuml;gen</button>
+    <button class="add-btn" onclick="document.getElementById('json-import-input').click()" style="border-style:solid;border-color:rgba(200,75,47,.4);color:rgba(200,75,47,.8);">&#8679; JSON importieren</button>
+    <input type="file" id="json-import-input" accept=".json" style="display:none" onchange="importJSON(event)"/>
+  </div>
+  <hr class="hr"/>
+  <div style="font-family:var(--font-mono);font-size:.58rem;color:rgba(255,255,255,.18);line-height:1.65;">
+    BMF PAP 2026 aktiv<br>
+    &sect;32a EStG &middot; SGB IV/XI<br>
+    Nur f&uuml;r Lehrzwecke
+  </div>
+</aside>
+
+<!-- MAIN -->
+
+<main class="main">
+
+  <!-- ABRECHNUNG -->
+
+  <div class="page on" id="pg-ab">
+    <div class="ph">
+      <div class="pt">Lohnabrechnung <span id="ma-title" style="color:var(--accent)"></span></div>
+      <div class="ps">BMF Programmablaufplan 2026 <span class="pap-badge">PAP AKTIV</span></div>
+    </div>
+
+
+<div class="g2" style="margin-bottom:1.1rem;">
+  <div class="card">
+    <div class="ct">Arbeitgeber</div>
+    <div class="field"><label>Firmenname</label><input id="ag" value="Mustermann GmbH"/></div>
+    <div class="r2">
+      <div class="field"><label>Stra&szlig;e & Nr.</label><input id="agstr" value="Musterstra&szlig;e 1"/></div>
+      <div class="field"><label>PLZ / Ort</label><input id="agort" value="10115 Berlin"/></div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>Monat</label>
+        <select id="mon">
+          <option>Januar</option><option>Februar</option><option>M&auml;rz</option><option>April</option>
+          <option selected>Mai</option><option>Juni</option><option>Juli</option><option>August</option>
+          <option>September</option><option>Oktober</option><option>November</option><option>Dezember</option>
+        </select>
+      </div>
+      <div class="field"><label>Jahr</label><input id="jahr" type="number" value="2026"/></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Arbeitnehmer</div>
+    <div class="r2">
+      <div class="field"><label>Vorname</label><input id="vn" value="Max"/></div>
+      <div class="field"><label>Nachname</label><input id="nn" value="Mustermann"/></div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>Stra&szlig;e & Nr.</label><input id="anstr" value="Musterweg 42"/></div>
+      <div class="field"><label>PLZ / Ort</label><input id="anort" value="10115 Berlin"/></div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>Personalnummer</label><input id="pnr" value="1001"/></div>
+      <div class="field"><label>Geburtsdatum</label><input id="geb" type="date" value="1985-01-01"/></div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>Steuer-ID</label><input id="stid" value="12 345 678 901"/></div>
+      <div class="field"><label>SV-Nummer</label><input id="svnr" value="01 010185 M 001"/></div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>IBAN</label><input id="iban" value="DE12 1004 0000 0123 4567 89" placeholder="DE00 0000 0000 0000 0000 00"/></div>
+      <div class="field"><label>BIC</label><input id="bic" value="COBADEFFXXX" placeholder="z.B. COBADEFFXXX"/></div>
+    </div>
+  </div>
+</div>
+
+<div class="g3" style="margin-bottom:1.1rem;">
+  <div class="card">
+    <div class="ct">Steuer (ELStAM)</div>
+    <div class="r2">
+      <div class="field"><label>Steuerklasse</label>
+        <select id="sk"><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option><option value="5">V</option><option value="6">VI</option></select>
+      </div>
+      <div class="field"><label>Kinderfreibetr&auml;ge</label>
+        <select id="kfb"><option value="0">0,0</option><option value="0.5">0,5</option><option value="1">1,0</option><option value="1.5">1,5</option><option value="2">2,0</option><option value="2.5">2,5</option><option value="3">3,0</option></select>
+      </div>
+    </div>
+    <div class="field"><label>ELStAM-Jahresfreibetrag (EUR/Jahr)</label><input id="fb" type="number" value="0"/><div class="hint">Mindert das zvE (z.B. erh&ouml;hte WK, Behinderungspauschale)</div></div>
+    <div class="field"><label>Hinzurechnungsbetrag (EUR/Jahr)</label><input id="hinzu" type="number" value="0"/></div>
+    <div class="field"><label>Kirchensteuer</label>
+      <select id="kist"><option value="0">Keine</option><option value="0.09">9 % (meiste Bundesl&auml;nder)</option><option value="0.08">8 % (Bayern / BW)</option></select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Sozialversicherung</div>
+    <div class="field"><label>Bundesland</label>
+      <select id="bl"><option value="west">West (ohne Sachsen)</option><option value="sachsen">Sachsen</option><option value="ost">Ost (ohne Sachsen)</option></select>
+    </div>
+    <div class="field"><label>Krankenkasse</label><input id="kk" value="AOK Berlin-Brandenburg"/></div>
+    <div class="field"><label>KV-Zusatzbeitrag AN+AG gesamt (%)</label>
+      <input id="kvz" type="number" step="0.01" value="2.20"/>
+      <div class="hint">F&uuml;r SV-Abzug. LSt-PAP nutzt Durchschnitt 2,9 %.</div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>Rentenversicherung</label><select id="rv"><option value="1">Pflichtversichert</option><option value="0">Befreit</option></select></div>
+      <div class="field"><label>Arbeitslosenvers.</label><select id="av"><option value="1">Pflichtversichert</option><option value="0">Befreit</option></select></div>
+    </div>
+    <div class="field"><label>Pflegeversicherung</label>
+      <select id="pv"><option value="mit">Mit Kindern (unter 23)</option><option value="ohne">Kinderlos (+0,60 % AN)</option></select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">Bez&uuml;ge &amp; Abz&uuml;ge</div>
+    <div class="field"><label>Grundgehalt (EUR/Monat)</label><input id="geh" type="number" value="3600"/></div>
+    <div class="r2">
+      <div class="field"><label>&Uuml;berstunden (EUR)</label><input id="ue" type="number" value="0"/></div>
+      <div class="field"><label>Sachbezug stpfl. (EUR)</label><input id="sach" type="number" value="0"/></div>
+    </div>
+    <div class="field"><label>Einmalzahlung / Weihnachtsgeld (EUR) <span class="badge-gold">F&uuml;nftelreg.</span></label><input id="wg" type="number" value="0"/></div>
+    <div class="r2">
+      <div class="field"><label>Fahrgeld steuerfrei (EUR)</label><input id="fg" type="number" value="0"/></div>
+      <div class="field"><label>VWL AG-Anteil (EUR)</label><input id="vwl" type="number" value="0"/></div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>Vorschuss / Pf&auml;ndung (EUR)</label><input id="vor" type="number" value="0"/></div>
+      <div class="field"><label>VWL AN-Eigenbetrag (EUR)</label><input id="vwlan" type="number" value="0"/></div>
+    </div>
+  </div>
+</div>
+
+<div class="brow">
+  <button class="btn btn-p" onclick="calc()">&#9633; Abrechnung berechnen</button>
+  <button class="btn btn-pdf" id="btn-pdf" style="display:none" onclick="makePDF()">&#128438; Als PDF drucken / speichern</button>
+  <button class="btn btn-json" id="btn-json" style="display:none" onclick="exportJSON()">&#8681; JSON exportieren</button>
+  <button class="btn btn-s" onclick="saveMA()">&#9670; Mitarbeiter speichern</button>
+</div>
+
+<div id="erg" style="display:none;margin-top:1.8rem;">
+  <div id="print-header">
+    <table style="width:100%;border-collapse:collapse;font-family:var(--font-sans);margin-bottom:.5rem;">
+      <tr>
+        <td style="vertical-align:top;width:55%">
+          <div style="font-size:14pt;font-weight:700;color:#1a1714;" id="ph-firma"></div>
+          <div style="font-size:8pt;color:#666;margin-top:.2rem;" id="ph-agaddr"></div>
+        </td>
+        <td style="text-align:right;vertical-align:top;">
+          <div style="font-size:11pt;font-weight:700;color:#1a1714;">LOHN- UND GEHALTSABRECHNUNG</div>
+          <div style="font-size:8pt;color:#666;margin-top:.2rem;" id="ph-periode"></div>
+        </td>
+      </tr>
+    </table>
+    <div style="border-top:2.5px solid #1a1714;margin:.4rem 0 .5rem;"></div>
+    <table style="width:100%;border-collapse:collapse;font-size:7.5pt;background:#f5f0e8;margin-bottom:.4rem;">
+      <tr>
+        <td style="padding:.35rem .6rem;color:#6b6459;white-space:nowrap">Arbeitnehmer/in</td>
+        <td style="padding:.35rem .6rem;font-weight:600;" id="ph-name"></td>
+        <td style="padding:.35rem .6rem;color:#6b6459;white-space:nowrap">Steuerklasse</td>
+        <td style="padding:.35rem .6rem;font-weight:600;" id="ph-sk"></td>
+        <td style="padding:.35rem .6rem;color:#6b6459;white-space:nowrap">Kinderfreibetr.</td>
+        <td style="padding:.35rem .6rem;font-weight:600;" id="ph-kfb"></td>
+      </tr>
+      <tr>
+        <td style="padding:.35rem .6rem;color:#6b6459;">Steuer-ID</td>
+        <td style="padding:.35rem .6rem;font-weight:600;" id="ph-stid"></td>
+        <td style="padding:.35rem .6rem;color:#6b6459;">SV-Nummer</td>
+        <td style="padding:.35rem .6rem;font-weight:600;" id="ph-svnr"></td>
+        <td style="padding:.35rem .6rem;color:#6b6459;">Personalnummer</td>
+        <td style="padding:.35rem .6rem;font-weight:600;" id="ph-pnr"></td>
+      </tr>
+      <tr>
+        <td style="padding:.35rem .6rem;color:#6b6459;">Krankenkasse</td>
+        <td style="padding:.35rem .6rem;font-weight:600;" id="ph-kk"></td>
+        <td style="padding:.35rem .6rem;color:#6b6459;">IBAN</td>
+        <td style="padding:.35rem .6rem;font-weight:600;" id="ph-iban"></td>
+        <td style="padding:.35rem .6rem;color:#6b6459;">BIC</td>
+        <td style="padding:.35rem .6rem;font-weight:600;" id="ph-bic"></td>
+      </tr>
+    </table>
+    <div style="border-top:1px solid #ccc;margin:.3rem 0 .5rem;"></div>
+  </div>
+  <hr style="border:none;border-top:2px solid var(--border);margin-bottom:1.4rem;">
+  <div class="rh">
+    <div><div class="rl">Gesamtbrutto</div><div class="rgross" id="r-gross"></div></div>
+    <div style="text-align:right"><div class="rl">Netto-Auszahlung</div><div class="rnet" id="r-net"></div></div>
+  </div>
+  <div class="card" style="overflow-x:auto;padding:.8rem;">
+    <table class="at" id="at"></table>
+  </div>
+  <div class="svg" id="svgrid"></div>
+  <div style="display:flex;gap:.6rem;align-items:center;margin-top:.8rem;padding:.6rem .9rem;background:var(--cream);border:1px solid var(--border);border-radius:8px;font-size:.78rem;" id="bank-box">
+    <span style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;">Überweisung an</span>
+    <span style="font-weight:600;" id="bank-name"></span>
+    <span style="color:var(--muted);">·</span>
+    <span style="font-family:var(--font-mono);" id="bank-iban"></span>
+    <span style="color:var(--muted);">·</span>
+    <span style="font-family:var(--font-mono);color:var(--muted);" id="bank-bic"></span>
+  </div>
+  <div class="info-b" id="hinweise" style="margin-top:.6rem;"></div>
+</div>
+
+
+  </div>
+
+  <!-- KUMULIERT -->
+
+  <div class="page" id="pg-kum">
+    <div class="ph"><div class="pt">Kumulierte Jahreswerte</div><div class="ps">Jahressummen je Monat &middot; Aktueller Mitarbeiter</div></div>
+    <div class="g3" style="margin-bottom:1.4rem;" id="kum-stats"></div>
+    <div class="card" style="overflow-x:auto;">
+      <div class="ct">Monats&uuml;bersicht (kumuliert)</div>
+      <div id="kum-tbl"></div>
+    </div>
+  </div>
+
+  <!-- EINSTELLUNGEN -->
+
+  <div class="page" id="pg-cfg">
+    <div class="ph"><div class="pt">Einstellungen</div><div class="ps">Beitragss&auml;tze &middot; BBG &middot; PAP-Parameter 2026</div></div>
+    <div class="g2">
+      <div class="card">
+        <div class="ct">Beitragss&auml;tze SV 2026</div>
+        <div class="field"><label>KV-Basissatz gesamt (%)</label><input id="cfg-kv" type="number" step="0.01" value="14.60"/></div>
+        <div class="field"><label>PV West gesamt (%)</label><input id="cfg-pv" type="number" step="0.01" value="3.60"/></div>
+        <div class="r2">
+          <div class="field"><label>PV Sachsen AN (%)</label><input id="cfg-pvs-an" type="number" step="0.01" value="2.30"/></div>
+          <div class="field"><label>PV Sachsen AG (%)</label><input id="cfg-pvs-ag" type="number" step="0.01" value="1.30"/></div>
+        </div>
+        <div class="field"><label>RV gesamt (%)</label><input id="cfg-rv" type="number" step="0.01" value="18.60"/></div>
+        <div class="field"><label>AV gesamt (%)</label><input id="cfg-av" type="number" step="0.01" value="2.60"/></div>
+        <div class="field"><label>PV Kinderlos-Zuschlag AN (%)</label><input id="cfg-pvz" type="number" step="0.01" value="0.60"/></div>
+      </div>
+      <div class="card">
+        <div class="ct">BBG &amp; PAP-Parameter 2026</div>
+        <div class="field"><label>BBG KV/PV monatlich (EUR)</label><input id="cfg-bbgkv" type="number" value="5512.50"/></div>
+        <div class="field"><label>BBG RV/AV West monatlich (EUR)</label><input id="cfg-bbgrv" type="number" value="8050"/></div>
+        <div class="field"><label>BBG RV/AV Ost monatlich (EUR)</label><input id="cfg-bbgrvo" type="number" value="7450"/></div>
+        <div class="field"><label>Grundfreibetrag (EUR/Jahr)</label><input id="cfg-gf" type="number" value="11784"/></div>
+        <div class="field"><label>Werbungskostenpauschbetrag (EUR/Jahr)</label><input id="cfg-wkp" type="number" value="1230"/></div>
+        <div class="field"><label>BMF-Durchschnittszusatzbeitrag KV 2026 (%) <span class="pap-badge">PAP</span></label>
+          <input id="cfg-kvavg" type="number" step="0.01" value="2.90"/>
+          <div class="hint">Wird im PAP f&uuml;r Vorsorgepauschale verwendet &ndash; nicht der individuelle Kassensatz!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ── SERVICE WORKER REGISTRIERUNG (Offline-Cache) ─────────────────────────────
+if ('serviceWorker' in navigator) {
+  // Inline Service Worker als Blob registrieren
+  const swCode = `
+    const CACHE = 'lohnpro-v1';
+    self.addEventListener('install', e => {
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(clients.claim());
+    });
+    self.addEventListener('fetch', e => {
+      // Alle Anfragen aus dem Cache bedienen wenn möglich
+      e.respondWith(
+        caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => cached))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+</script>
+
+<script>
+// ── STORE ────────────────────────────────────────────────────────────────────
+let MAs = (()=>{ try { return JSON.parse(localStorage.getItem('lp_ma')||'[]')||[]; } catch(e){ localStorage.removeItem('lp_ma'); return []; } })();
+let curMA = 0;
+let lastCalc = null;
+const MONATE = ['Januar','Februar','M\u00e4rz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+// ── BMF PAP 2026 ─────────────────────────────────────────────────────────────
+function pap2026(brutto_m, stkl, kfb, jfreib, jhinzu, pvz, pvs, rv_an) {
+  const F = 12;
+  const JRE4 = brutto_m * F;
+  const GF   = cfgN('cfg-gf');
+  const WKP  = cfgN('cfg-wkp');
+  const KVAVG= cfgN('cfg-kvavg') / 100;
+  const BBG_KV = cfgN('cfg-bbgkv') * 12;
+  const BBG_RV = cfgN('cfg-bbgrv') * 12;
+
+  // Vorsorgepauschale (PAP-interne Größen, nicht individuelle Beiträge!)
+  const ANRV = rv_an ? Math.floor(Math.min(JRE4, BBG_RV) * 0.093) : 0;
+  const kv_an_pap = 0.073 + KVAVG / 2;
+  const ANKV = Math.floor(Math.min(JRE4, BBG_KV) * kv_an_pap);
+  let pv_s = pvs ? cfgN('cfg-pvs-an')/100 : cfgN('cfg-pv')/100/2;
+  if (pvz) pv_s += cfgN('cfg-pvz')/100;
+  const ANPV = Math.floor(Math.min(JRE4, BBG_KV) * pv_s);
+  const VPS_real = ANRV + ANKV + ANPV;
+  const MVSP = [1,2,3,4].includes(stkl) ? Math.min(1900, Math.floor(JRE4*0.12)) : 0;
+  const VPS  = Math.max(VPS_real, MVSP);
+
+  const WKPa = [1,2,3,4].includes(stkl) ? WKP : 0;
+  const SAP  = stkl===3 ? 72 : ([1,2,4].includes(stkl) ? 36 : 0);
+  const GFB  = stkl===3 ? GF*2 : GF;
+  const KFB  = kfb * 4656;
+  let ZVE = Math.max(0, Math.floor(JRE4 - WKPa - SAP - VPS - KFB - jfreib + jhinzu));
+
+  function tar(x) {
+    if (x <= GF) return 0;
+    if (x <= 17005) { const y=(x-GF)/1e4; return Math.floor((922.98*y+1400)*y); }
+    if (x <= 66760) { const y=(x-17005)/1e4; return Math.floor((181.19*y+2397)*y+966.53); }
+    if (x <= 277825) return Math.floor(0.42*x-10908.68);
+    return Math.floor(0.45*x-19246.93);
+  }
+  let ST;
+  if (stkl===3)      ST = tar(ZVE/2)*2;
+  else if (stkl===5) ST = Math.max(0, tar(ZVE+GF+WKPa+SAP) - tar(GF+WKPa+SAP));
+  else if (stkl===6) ST = tar(ZVE+GF);
+  else               ST = tar(ZVE);
+
+  let SOLZ_J = 0;
+  if (ST > 18130) { SOLZ_J = Math.min(ST*0.055,(ST-18130)*0.119); if(ST>=25372) SOLZ_J=ST*0.055; SOLZ_J=Math.floor(SOLZ_J); }
+
+  return { LST_M:Math.floor(ST/F), SOLZ_M:Math.floor(SOLZ_J/F), LST_J:ST, SOLZ_J, ZVE, VPS, ANRV, ANKV, ANPV };
+}
+
+// ── HAUPTBERECHNUNG ───────────────────────────────────────────────────────────
+function calc() {
+  const stkl  = parseInt(g('sk'));
+  const kfb   = parseFloat(g('kfb'));
+  const jfb   = gn('fb');
+  const jhinzu= gn('hinzu');
+  const kist  = parseFloat(g('kist'));
+  const bl    = g('bl');
+  const kvZ   = gn('kvz')/100;
+  const rvP   = g('rv')==='1';
+  const avP   = g('av')==='1';
+  const pvZ   = g('pv')==='ohne';
+  const pvS   = bl==='sachsen';
+
+  const gehalt= gn('geh'), ue=gn('ue'), sach=gn('sach'), wg=gn('wg');
+  const fg=gn('fg'), vwl=gn('vwl'), vor=gn('vor'), vwlan=gn('vwlan');
+  const lfdB  = gehalt + ue + sach;
+
+  const bbgKV = cfgN('cfg-bbgkv');
+  const bbgRV = bl==='ost' ? cfgN('cfg-bbgrvo') : cfgN('cfg-bbgrv');
+  const kv_b  = cfgN('cfg-kv')/100;
+  const pv_g  = cfgN('cfg-pv')/100;
+  const rv_g  = cfgN('cfg-rv')/100;
+  const av_g  = cfgN('cfg-av')/100;
+  const pvz_s = cfgN('cfg-pvz')/100;
+
+  const svBKV = Math.min(lfdB, bbgKV);
+  const svBRV = Math.min(lfdB, bbgRV);
+
+  const kv_an_s = kv_b/2 + kvZ/2;
+  const kv_ag_s = kv_b/2 + kvZ/2;
+  const kv_an = r2(svBKV * kv_an_s), kv_ag = r2(svBKV * kv_ag_s);
+
+  let pv_an_s = pvS ? cfgN('cfg-pvs-an')/100 : pv_g/2;
+  let pv_ag_s = pvS ? cfgN('cfg-pvs-ag')/100 : pv_g/2;
+  if (pvZ) pv_an_s += pvz_s;
+  const pv_an = r2(svBKV * pv_an_s), pv_ag = r2(svBKV * pv_ag_s);
+
+  const rv_an = rvP ? r2(svBRV * rv_g/2) : 0;
+  const rv_ag = rvP ? r2(svBRV * rv_g/2) : 0;
+  const av_an = avP ? r2(svBRV * av_g/2) : 0;
+  const av_ag = avP ? r2(svBRV * av_g/2) : 0;
+
+  // SV auf Einmalzahlung
+  const sbKV = Math.max(0, Math.min(wg, bbgKV - svBKV));
+  const sbRV = Math.max(0, Math.min(wg, bbgRV - svBRV));
+  const kv_an_sb=r2(sbKV*kv_an_s), kv_ag_sb=r2(sbKV*kv_ag_s);
+  const pv_an_sb=r2(sbKV*pv_an_s), pv_ag_sb=r2(sbKV*pv_ag_s);
+  const rv_an_sb=rvP?r2(sbRV*rv_g/2):0, rv_ag_sb=rvP?r2(sbRV*rv_g/2):0;
+  const av_an_sb=avP?r2(sbRV*av_g/2):0, av_ag_sb=avP?r2(sbRV*av_g/2):0;
+  const sv_an_sb=r2(kv_an_sb+pv_an_sb+rv_an_sb+av_an_sb);
+  const sv_ag_sb=r2(kv_ag_sb+pv_ag_sb+rv_ag_sb+av_ag_sb);
+  const sv_an=r2(kv_an+pv_an+rv_an+av_an+sv_an_sb);
+  const sv_ag=r2(kv_ag+pv_ag+rv_ag+av_ag+sv_ag_sb);
+
+  // PAP 2026
+  const pap = pap2026(lfdB, stkl, kfb, jfb, jhinzu, pvZ, pvS, rvP);
+
+  // Fünftelregelung
+  let lst_sb=0, solz_sb=0;
+  if (wg > 0) {
+    const GF=cfgN('cfg-gf'), WKP=cfgN('cfg-wkp');
+    function tar5(x){ if(x<=GF)return 0; if(x<=17005){const y=(x-GF)/1e4;return Math.floor((922.98*y+1400)*y);} if(x<=66760){const y=(x-17005)/1e4;return Math.floor((181.19*y+2397)*y+966.53);} if(x<=277825)return Math.floor(0.42*x-10908.68); return Math.floor(0.45*x-19246.93); }
+    function lstSK(z,sk){ if(sk===3)return tar5(z/2)*2; const sap=sk===3?72:([1,2,4].includes(sk)?36:0); if(sk===5)return Math.max(0,tar5(z+GF+WKP+sap)-tar5(GF+WKP+sap)); if(sk===6)return tar5(z+GF); return tar5(z); }
+    const z5 = Math.max(0, Math.floor(pap.ZVE + wg/5));
+    lst_sb = Math.max(0, (lstSK(z5,stkl) - lstSK(pap.ZVE,stkl)) * 5);
+    if(lst_sb>18130){ solz_sb=Math.floor(Math.min(lst_sb*0.055,(lst_sb-18130)*0.119)); if(lst_sb>=25372)solz_sb=Math.floor(lst_sb*0.055); }
+  }
+
+  const kist_m  = r2(pap.LST_M * kist);
+  const kist_sb = r2(lst_sb * kist);
+  const kist_g  = r2(kist_m + kist_sb);
+  const lst_g   = r2(pap.LST_M + lst_sb);
+  const solz_g  = r2(pap.SOLZ_M + solz_sb);
+  const grossB  = r2(lfdB + wg + fg + vwl);
+  const netto   = r2(grossB - sv_an - lst_g - solz_g - kist_g - vor - vwlan);
+
+  lastCalc = {
+    monat:g('mon'), brutto:lfdB, wg, fg, vwl, grossB, sv_an, sv_ag,
+    kv_an, pv_an, rv_an, av_an, kv_ag, pv_ag, rv_ag, av_ag,
+    kv_an_sb, pv_an_sb, rv_an_sb, av_an_sb, kv_ag_sb, pv_ag_sb, rv_ag_sb, av_ag_sb,
+    sv_an_sb, sv_ag_sb, lst_m:pap.LST_M, lst_sb, lst_g, solz_g, kist_g, netto,
+    pap, vor, vwlan, svBKV, svBRV, kv_an_s, pv_an_s, kv_ag_s, pv_ag_s,
+    stkl, kfb, rvP, avP, kist, pvZ, bbgKV, bbgRV,
+    gehalt, ue, sach
+  };
+
+  // Monat speichern
+  if (MAs[curMA]) {
+    if (!MAs[curMA].mon) MAs[curMA].mon = {};
+    MAs[curMA].mon[MONATE.indexOf(g('mon'))] = lastCalc;
+    saveStore();
+  }
+
+  renderErg(lastCalc);
+}
+
+// ── RENDER ERGEBNIS ───────────────────────────────────────────────────────────
+function renderErg(d) {
+  document.getElementById('r-gross').textContent = e(d.grossB);
+  document.getElementById('r-net').textContent   = e(d.netto);
+
+  const sh = t=>`<tr class="sh-row"><td colspan="3">${t}</td></tr>`;
+  const dr = (l,h,b,m=true)=>`<tr><td>${l}</td><td style="color:var(--muted);font-size:.78rem">${h}</td><td>${m?'&ndash; ':''}<b>${e(b)}</b></td></tr>`;
+  const sr = (l,b,m=true)=>`<tr class="sub-row"><td><b>${l}</b></td><td></td><td><b>${m?'&ndash; ':''}${e(b)}</b></td></tr>`;
+
+  let rows = sh('BEZ&Uuml;GE');
+  rows += dr('Grundgehalt','Laufender Bezug', d.gehalt, false);
+  if(d.ue>0)   rows += dr('&Uuml;berstundenvergu&#776;tung','lfd. Bezug', d.ue, false);
+  if(d.sach>0) rows += dr('Sachbezug (&#167;8 EStG)','stpfl.', d.sach, false);
+  if(d.fg>0)   rows += dr('Fahrgeld (steuerfrei)','&#167;3 Nr.13/16 EStG', d.fg, false);
+  if(d.vwl>0)  rows += dr('VWL &ndash; AG-Anteil','', d.vwl, false);
+  if(d.wg>0)   rows += dr('Einmalzahlung / Weihnachtsgeld','F&uuml;nftelregelung &#167;39b Abs.3 EStG', d.wg, false);
+  rows += sr('Gesamtbez&uuml;ge (brutto)', d.grossB, false);
+
+  rows += sh('ABZU&#776;GE &ndash; SOZIALVERSICHERUNG (AN-Anteil)');
+  rows += dr('Krankenversicherung'+(d.grossB>d.bbgKV?' <span style="color:var(--accent);font-size:.7rem">BBG</span>':''), p(d.kv_an_s)+' von '+e(d.svBKV), d.kv_an);
+  rows += dr('Pflegeversicherung'+(d.pvZ?' <span style="color:var(--accent);font-size:.7rem">+0,60%</span>':''), p(d.pv_an_s)+' von '+e(d.svBKV), d.pv_an);
+  if(d.rvP) rows += dr('Rentenversicherung','9,30 % von '+e(d.svBRV), d.rv_an);
+  if(d.avP) rows += dr('Arbeitslosenversicherung','1,30 % von '+e(d.svBRV), d.av_an);
+  if(d.sv_an_sb>0) rows += dr('SV auf Einmalzahlung','BBG-Restbetrag', d.sv_an_sb);
+  rows += sr('SV-Beitr&auml;ge gesamt (AN)', d.sv_an);
+
+  rows += sh('ABZU&#776;GE &ndash; STEUERN <span class="pap-badge" style="font-size:.55rem">BMF PAP 2026</span>');
+  rows += dr('Lohnsteuer (laufend)', 'SK '+d.stkl+' &middot; zvE/Jahr: '+e(d.pap.ZVE)+' &middot; Vorsorge-Pausch.: '+e(d.pap.VPS), d.lst_m);
+  if(d.wg>0) rows += dr('Lohnsteuer (Einmalzahlung, F&uuml;nftelreg.)','&#167;39b Abs.3 EStG', d.lst_sb);
+  rows += dr('Solidarit&auml;tszuschlag', d.solz_g<0.01?'Freigrenze (Jahres-LSt &lt; 18.130 EUR)':'5,50 % der LSt', d.solz_g);
+  if(d.kist>0) rows += dr('Kirchensteuer',(d.kist*100).toFixed(0)+' % der LSt (&#167;51a EStG)', d.kist_g);
+  else rows += `<tr><td>Kirchensteuer</td><td style="color:var(--muted);font-size:.78rem;font-style:italic">keine (konfessionslos)</td><td>&ndash; 0,00 EUR</td></tr>`;
+
+  if(d.vor>0||d.vwlan>0){
+    rows += sh('SONSTIGE ABZU&#776;GE');
+    if(d.vor>0)   rows += dr('Vorschuss / Pf&auml;ndung','', d.vor);
+    if(d.vwlan>0) rows += dr('VWL &ndash; AN-Eigenbetrag','&#167;13 VermBG', d.vwlan);
+  }
+  rows += `<tr class="tot-row"><td><b>NETTO-AUSZAHLUNG</b></td><td></td><td><b>${e(d.netto)}</b></td></tr>`;
+
+  document.getElementById('at').innerHTML = `<thead><tr><th style="width:37%">Position</th><th>Satz / Hinweis</th><th>Betrag</th></tr></thead><tbody>${rows}</tbody>`;
+
+  document.getElementById('svgrid').innerHTML = [
+    ['Krankenversicherung', d.kv_an+d.kv_an_sb, d.kv_ag+d.kv_ag_sb],
+    ['Pflegeversicherung',  d.pv_an+d.pv_an_sb, d.pv_ag+d.pv_ag_sb],
+    ['Rentenversicherung',  d.rv_an+d.rv_an_sb, d.rv_ag+d.rv_ag_sb],
+    ['Arbeitslosenvers.',   d.av_an+d.av_an_sb, d.av_ag+d.av_ag_sb],
+  ].map(([l,an,ag])=>`<div class="svb"><div class="svbl">${l}</div><div class="svba">AN: ${e(an)}</div><div class="svbag">AG: ${e(ag)}</div><div class="svbt">&#8721; ${e(an+ag)}</div></div>`).join('');
+
+  const hi = [];
+  hi.push(`<b>BMF PAP 2026 Vorsorgepauschale: ${e(d.pap.VPS)}/Jahr</b> (RV: ${e(d.pap.ANRV)}, KV &#216; ${e(d.pap.ANKV)}, PV: ${e(d.pap.ANPV)}). PAP nutzt Durchschnitts-Zusatzbeitrag ${cfgN('cfg-kvavg').toFixed(2)} %, nicht den individuellen Kassensatz &rarr; LSt kann von Eigenberechnung abweichen.`);
+  if(d.grossB>d.bbgKV) hi.push(`BBG KV/PV &uuml;berschritten (${e(d.bbgKV)}/Mt.): SV gekappt.`);
+  if(d.grossB>d.bbgRV) hi.push(`BBG RV/AV &uuml;berschritten (${e(d.bbgRV)}/Mt.): SV gekappt.`);
+  if(d.pvZ) hi.push('Kinderloser AN: PV-Zuschlag +0,60 % (AN-Anteil, &#167;58 SGB XI).');
+  if(d.wg>0) hi.push(`Einmalzahlung ${e(d.wg)}: LSt via F&uuml;nftelregelung &#167;39b Abs.3 EStG.`);
+  document.getElementById('hinweise').innerHTML = hi.join('<br>');
+
+  // Bankdaten anzeigen
+  const setB = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v||'–'; };
+  setB('bank-name', g('vn')+' '+g('nn'));
+  setB('bank-iban', g('iban')||'keine Angabe');
+  setB('bank-bic',  g('bic')||'');
+  document.getElementById('erg').style.display = 'block';
+  document.getElementById('btn-pdf').style.display = 'inline-flex';
+  document.getElementById('btn-json').style.display = 'inline-flex';
+  renderKum();
+}
+
+// ── KUMULIERT ─────────────────────────────────────────────────────────────────
+function renderKum() {
+  const ma = MAs[curMA];
+  if (!ma || !ma.mon || !Object.keys(ma.mon).length) {
+    document.getElementById('kum-stats').innerHTML = '<div class="card" style="grid-column:1/-1;color:var(--muted);font-size:.85rem;">Noch keine Abrechnungen. Berechne zuerst eine Abrechnung.</div>';
+    document.getElementById('kum-tbl').innerHTML = '';
+    return;
+  }
+  const keys = Object.keys(ma.mon).map(Number).sort((a,b)=>a-b);
+  let cB=0,cSV=0,cLST=0,cN=0, rows='';
+  keys.forEach(mi=>{
+    const d=ma.mon[mi];
+    cB+=d.grossB||0; cSV+=d.sv_an||0; cLST+=(d.lst_g||0)+(d.solz_g||0)+(d.kist_g||0); cN+=d.netto||0;
+    const cur = d.monat===g('mon');
+    rows+=`<tr class="${cur?'cur':''}"><td>${MONATE[mi]}</td><td>${e(d.grossB)}</td><td>${e(d.sv_an)}</td><td>${e(d.lst_g)}</td><td>${e(d.solz_g)}</td><td>${e(d.kist_g)}</td><td>${e(d.netto)}</td><td>${e(cB)}</td><td>${e(cN)}</td></tr>`;
+  });
+  rows+=`<tr class="ges"><td>&#8721; Gesamt</td><td>${e(cB)}</td><td>${e(cSV)}</td><td colspan="3"></td><td>${e(cN)}</td><td>${e(cB)}</td><td>${e(cN)}</td></tr>`;
+  document.getElementById('kum-stats').innerHTML=`
+    <div class="stc"><div class="stv">${e(cB)}</div><div class="stl">Jahresbrutto kumuliert</div></div>
+    <div class="stc"><div class="stv" style="color:var(--accent)">${e(cSV)}</div><div class="stl">SV-Beitr&auml;ge AN kumuliert</div></div>
+    <div class="stc"><div class="stv" style="color:var(--green)">${e(cN)}</div><div class="stl">Netto kumuliert</div></div>`;
+  document.getElementById('kum-tbl').innerHTML=`<table class="kt"><thead><tr><th style="text-align:left">Monat</th><th>Brutto</th><th>SV-AN</th><th>LSt</th><th>SolZ</th><th>KiSt</th><th>Netto</th><th>&#8721;Brutto</th><th>&#8721;Netto</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ── JSON EXPORT ───────────────────────────────────────────────────────────────
+function exportJSON() {
+  if (!lastCalc) { alert('Bitte zuerst eine Abrechnung berechnen.'); return; }
+
+  const monat  = g('mon');
+  const jahr   = g('jahr');
+  const vorname = g('vn');
+  const nachname = g('nn');
+
+  const exportData = {
+    meta: {
+      exportiert_am: new Date().toLocaleString('de-DE'),
+      tool: 'LohnPRO 2026',
+      berechnungsgrundlage: 'BMF Programmablaufplan 2026 §39b EStG'
+    },
+    arbeitgeber: {
+      firma:   g('ag'),
+      strasse: g('agstr'),
+      ort:     g('agort')
+    },
+    arbeitnehmer: {
+      vorname,
+      nachname,
+      strasse:       g('anstr'),
+      ort:           g('anort'),
+      geburtsdatum:  g('geb'),
+      personalnummer:g('pnr'),
+      steuer_id:     g('stid'),
+      sv_nummer:     g('svnr'),
+      iban:          g('iban'),
+      bic:           g('bic'),
+      krankenkasse:  g('kk')
+    },
+    steuer: {
+      steuerklasse:       parseInt(g('sk')),
+      kinderfreibetraege: parseFloat(g('kfb')),
+      jahresfreibetrag:   parseFloat(g('fb')) || 0,
+      hinzurechnungsbetrag: parseFloat(g('hinzu')) || 0,
+      kirchensteuer_satz: parseFloat(g('kist')),
+      kirchensteuer_prozent: (parseFloat(g('kist')) * 100).toFixed(0) + ' %'
+    },
+    sozialversicherung: {
+      bundesland:          g('bl'),
+      kv_zusatzbeitrag_pct: parseFloat(g('kvz')),
+      rentenversicherung:  g('rv') === '1' ? 'Pflichtversichert' : 'Befreit',
+      arbeitslosenvers:    g('av') === '1' ? 'Pflichtversichert' : 'Befreit',
+      pflegeversicherung:  g('pv') === 'mit' ? 'Mit Kindern' : 'Kinderlos (+0,60%)'
+    },
+    abrechnungszeitraum: {
+      monat,
+      jahr: parseInt(jahr)
+    },
+    bezuege: {
+      grundgehalt:        lastCalc.gehalt,
+      ueberstunden:       lastCalc.ue      || 0,
+      sachbezug:          lastCalc.sach    || 0,
+      einmalzahlung_wg:   lastCalc.wg      || 0,
+      fahrgeld_steuerfrei:lastCalc.fg      || 0,
+      vwl_ag_anteil:      lastCalc.vwl     || 0,
+      gesamtbrutto:       lastCalc.grossB
+    },
+    sozialversicherung_betraege: {
+      kv_an:  lastCalc.kv_an,
+      kv_ag:  lastCalc.kv_ag,
+      pv_an:  lastCalc.pv_an,
+      pv_ag:  lastCalc.pv_ag,
+      rv_an:  lastCalc.rv_an,
+      rv_ag:  lastCalc.rv_ag,
+      av_an:  lastCalc.av_an,
+      av_ag:  lastCalc.av_ag,
+      sv_an_gesamt: lastCalc.sv_an,
+      sv_ag_gesamt: lastCalc.sv_ag
+    },
+    steuern: {
+      pap_2026: {
+        zve_jahresbasis:    lastCalc.pap.ZVE,
+        vorsorgepauschale:  lastCalc.pap.VPS,
+        jahres_lohnsteuer:  lastCalc.pap.LST_J,
+        jahres_solz:        lastCalc.pap.SOLZ_J
+      },
+      lohnsteuer_monat:     lastCalc.lst_m,
+      lohnsteuer_einmal:    lastCalc.lst_sb || 0,
+      lohnsteuer_gesamt:    lastCalc.lst_g,
+      solidaritaetszuschlag:lastCalc.solz_g,
+      kirchensteuer:        lastCalc.kist_g
+    },
+    abzuege_sonstige: {
+      vorschuss_pfaendung:  lastCalc.vor    || 0,
+      vwl_an_eigenbetrag:   lastCalc.vwlan  || 0
+    },
+    ergebnis: {
+      netto_auszahlung: lastCalc.netto
+    },
+    kumuliert: (() => {
+      const ma = MAs[curMA];
+      if (!ma || !ma.mon) return null;
+      let cumB=0, cumSV=0, cumLST=0, cumN=0;
+      const monate = [];
+      Object.keys(ma.mon).sort((a,b)=>a-b).forEach(mi => {
+        const d = ma.mon[mi];
+        cumB  += d.grossB || 0;
+        cumSV += d.sv_an  || 0;
+        cumLST+= (d.lst_g||0) + (d.solz_g||0) + (d.kist_g||0);
+        cumN  += d.netto  || 0;
+        monate.push({
+          monat: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][mi],
+          brutto: d.grossB, sv_an: d.sv_an,
+          lohnsteuer: d.lst_g, solz: d.solz_g, kist: d.kist_g,
+          netto: d.netto
+        });
+      });
+      return {
+        monate,
+        jahressummen: {
+          brutto_gesamt: cumB,
+          sv_an_gesamt:  cumSV,
+          steuern_gesamt:cumLST,
+          netto_gesamt:  cumN
+        }
+      };
+    })()
+  };
+
+  const json = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `Lohnabrechnung_${nachname}_${monat}_${jahr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── PDF EXPORT (Nativer Druckdialog – funktioniert in allen Browsern) ────────
+function makePDF() {
+  if (!lastCalc) { alert('Bitte zuerst eine Abrechnung berechnen.'); return; }
+  const d = lastCalc;
+
+  // Print-Header befüllen
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val||''; };
+  set('ph-firma',   g('ag'));
+  set('ph-agaddr',  g('agstr') + ' · ' + g('agort'));
+  set('ph-periode', g('mon') + ' ' + g('jahr') + '  ·  01.–' + new Date(parseInt(g('jahr')), ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'].indexOf(g('mon'))+1, 0).getDate() + '.' + String(['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'].indexOf(g('mon'))+1).padStart(2,'0') + '.' + g('jahr'));
+  set('ph-name',    g('vn') + ' ' + g('nn'));
+  set('ph-sk',      'SK ' + g('sk') + ' – ' + {1:'Ledig',2:'Alleinerziehend',3:'Verheiratet (höher)',4:'Verheiratet (gleich)',5:'Verheiratet (niedriger)',6:'Zweitjob'}[g('sk')]);
+  set('ph-kfb',     g('kfb'));
+  set('ph-stid',    g('stid'));
+  set('ph-svnr',    g('svnr'));
+  set('ph-pnr',     g('pnr'));
+  set('ph-kk',      g('kk'));
+  set('ph-iban',    g('iban'));
+  set('ph-bic',     g('bic'));
+
+  // Kurz warten dann drucken
+  setTimeout(() => { window.print(); }, 150);
+}
+
+// ── MA-VERWALTUNG ─────────────────────────────────────────────────────────────
+function renderMAList() {
+  const el = document.getElementById('emp-list');
+  if (!MAs.length) { el.innerHTML='<div style="font-size:.73rem;color:rgba(255,255,255,.25);text-align:center;padding:.4rem;">Noch kein Mitarbeiter</div>'; return; }
+  el.innerHTML = MAs.map((m,i)=>`<div class="emp-item ${i===curMA?'on':''}" onclick="loadMA(${i})"><button class="emp-del" onclick="event.stopPropagation();delMA(${i})">&#10005;</button><div class="emp-name">${m.vn} ${m.nn}</div><div class="emp-meta">SK ${m.sk} &middot; ${e(m.geh)}/Mt.</div></div>`).join('');
+  document.getElementById('ma-title').textContent = MAs[curMA] ? '– '+MAs[curMA].vn+' '+MAs[curMA].nn : '';
+}
+
+function saveStore() { localStorage.setItem('lp_ma', JSON.stringify(MAs)); renderMAList(); }
+
+function saveMA() {
+  const ma = { vn:g('vn'),nn:g('nn'),sk:g('sk'),geh:gn('geh'),anstr:g('anstr'),anort:g('anort'),geb:g('geb'),pnr:g('pnr'),stid:g('stid'),svnr:g('svnr'),kk:g('kk'),kvz:g('kvz'),bl:g('bl'),rv:g('rv'),av:g('av'),pv:g('pv'),kist:g('kist'),fb:g('fb'),hinzu:g('hinzu'),kfb:g('kfb'),iban:g('iban'),bic:g('bic'), mon: MAs[curMA]?.mon||{} };
+  if(MAs[curMA]!==undefined){ MAs[curMA]=ma; } else { MAs.push(ma); curMA=MAs.length-1; }
+  saveStore();
+}
+
+function loadMA(i) {
+  curMA=i; const m=MAs[i]; if(!m) return;
+  const sv=(id,v)=>{ const el=document.getElementById(id); if(el&&v!==undefined)el.value=v; };
+  sv('vn',m.vn);sv('nn',m.nn);sv('sk',m.sk);sv('geh',m.geh);sv('anstr',m.anstr);sv('anort',m.anort);sv('geb',m.geb);
+  sv('pnr',m.pnr);sv('stid',m.stid);sv('svnr',m.svnr);sv('kk',m.kk);sv('kvz',m.kvz);sv('bl',m.bl);
+  sv('rv',m.rv);sv('av',m.av);sv('pv',m.pv);sv('kist',m.kist);sv('fb',m.fb);sv('hinzu',m.hinzu);sv('kfb',m.kfb);sv('iban',m.iban);sv('bic',m.bic);
+  document.getElementById('erg').style.display='none';
+  document.getElementById('btn-pdf').style.display='none';
+  renderMAList(); renderKum();
+}
+
+function addMA() {
+  curMA=MAs.length;
+  ['vn','nn','anstr','anort','pnr','stid','svnr','geb'].forEach(id=>document.getElementById(id).value='');
+  ['geh','ue','sach','wg','fg','vwl','vor','vwlan','fb','hinzu'].forEach(id=>document.getElementById(id).value='0');
+  document.getElementById('erg').style.display='none';
+  document.getElementById('btn-pdf').style.display='none';
+  renderMAList();
+}
+
+function delMA(i) {
+  if(!confirm('Mitarbeiter "'+MAs[i].vn+' '+MAs[i].nn+'" loeschen?'))return;
+  MAs.splice(i,1); curMA=Math.max(0,Math.min(curMA,MAs.length-1)); saveStore();
+  if(MAs.length>0 && MAs[curMA]) loadMA(curMA); else { curMA=0; renderMAList(); }
+}
+
+// ── NAV & UTILS ───────────────────────────────────────────────────────────────
+function goPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+name).classList.add('on');
+  document.getElementById('nav-'+name).classList.add('on');
+  if(name==='kum') renderKum();
+}
+
+function g(id)   { return document.getElementById(id)?.value||''; }
+function gn(id)  { return parseFloat(document.getElementById(id)?.value)||0; }
+function cfgN(id){ return parseFloat(document.getElementById(id)?.value)||0; }
+function e(n)    { const v=Number(n); return (isNaN(v)?0:v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' EUR'; }
+function p(s)    { return (s*100).toFixed(2).replace('.',',')+' %'; }
+function r2(n)   { return Math.round(n*100)/100; }
+
+// ── JSON IMPORT ───────────────────────────────────────────────────────────────
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Felder befüllen
+      const sv = (id, val) => { const el=document.getElementById(id); if(el&&val!==undefined&&val!==null) el.value=val; };
+      if (data.arbeitgeber) {
+        sv('ag',    data.arbeitgeber.firma);
+        sv('agstr', data.arbeitgeber.strasse);
+        sv('agort', data.arbeitgeber.ort);
+      }
+      if (data.arbeitnehmer) {
+        const an = data.arbeitnehmer;
+        sv('vn',   an.vorname);    sv('nn',   an.nachname);
+        sv('anstr',an.strasse);    sv('anort',an.ort);
+        sv('geb',  an.geburtsdatum);
+        sv('pnr',  an.personalnummer);
+        sv('stid', an.steuer_id);  sv('svnr', an.sv_nummer);
+        sv('iban', an.iban);       sv('bic',  an.bic);
+        sv('kk',   an.krankenkasse);
+        
+      }
+      if (data.steuer) {
+        sv('sk',   data.steuer.steuerklasse);
+        sv('kfb',  data.steuer.kinderfreibetraege);
+        sv('fb',   data.steuer.jahresfreibetrag);
+        sv('hinzu',data.steuer.hinzurechnungsbetrag);
+        sv('kist', data.steuer.kirchensteuer_satz);
+      }
+      if (data.sozialversicherung) {
+        sv('bl',  data.sozialversicherung.bundesland);
+        sv('kvz', data.sozialversicherung.kv_zusatzbeitrag_pct);
+        sv('rv',  data.sozialversicherung.rentenversicherung === 'Pflichtversichert' ? '1' : '0');
+        sv('av',  data.sozialversicherung.arbeitslosenvers   === 'Pflichtversichert' ? '1' : '0');
+        sv('pv',  data.sozialversicherung.pflegeversicherung?.startsWith('Mit') ? 'mit' : 'ohne');
+      }
+      if (data.abrechnungszeitraum) {
+        sv('mon',  data.abrechnungszeitraum.monat);
+        sv('jahr', data.abrechnungszeitraum.jahr);
+      }
+      if (data.bezuege) {
+        sv('geh',  data.bezuege.grundgehalt);
+        sv('ue',   data.bezuege.ueberstunden);
+        sv('sach', data.bezuege.sachbezug);
+        sv('wg',   data.bezuege.einmalzahlung_wg);
+        sv('fg',   data.bezuege.fahrgeld_steuerfrei);
+        sv('vwl',  data.bezuege.vwl_ag_anteil);
+      }
+      // Als neuen Mitarbeiter speichern
+      curMA = MAs.length;
+      saveMA();
+      document.getElementById('erg').style.display = 'none';
+      document.getElementById('btn-pdf').style.display = 'none';
+      document.getElementById('btn-json').style.display = 'none';
+      alert('JSON erfolgreich importiert! Mitarbeiter "' + g('vn') + ' ' + g('nn') + '" wurde angelegt.');
+    } catch(err) {
+      alert('Fehler beim Importieren: ' + err.message + '\nBitte prüfe ob die Datei ein gültiges LohnPRO-JSON ist.');
+    }
+    event.target.value = ''; // Reset für erneuten Import
+  };
+  reader.readAsText(file);
+}
+
+// INIT
+renderMAList();
+if(MAs.length>0) loadMA(0);
+</script>
+
+</body>
+</html>
