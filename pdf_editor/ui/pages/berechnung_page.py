@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QLineEdit, QPushButton, QScrollArea, QSizePolicy,
     QVBoxLayout, QWidget,
 )
-from pdf_editor.core.sv_calculator import calculate_full, BBG_KV_2025, BBG_RV_2025
+from pdf_editor.core.sv_calculator import calculate_full
 from pdf_editor.core.number_utils import fmt_de
 from pdf_editor.ui import theme
 
@@ -208,7 +208,7 @@ class BerechnungPage(QWidget):
         self._f("av_status", sv_l, "Arbeitslosenvers.", None, is_combo=True,
                 items=["Pflichtversichert","Befreit"])
         self._f("beschaeftigung", sv_l, "Beschäftigungsart", None, is_combo=True,
-                items=["Vollzeit / Teilzeit","Minijob (≤538€)","Midijob (538-2.000€)"])
+                items=["Vollzeit / Teilzeit","Minijob (≤603€)","Midijob (603,01-2.000€)"])
         sv_l.addStretch()
         r2.addWidget(sv_card)
 

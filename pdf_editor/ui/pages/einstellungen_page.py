@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (
     QLineEdit, QPushButton, QVBoxLayout, QWidget,
 )
 from pdf_editor.core.sv_calculator import (
-    BBG_KV_2025, BBG_RV_2025, KV_BASIS, PV_WEST, RV_SATZ,
+    BBG_KV_2026, BBG_RV_2026, KV_BASIS, PV_WEST, RV_SATZ,
     AV_SATZ, PV_KINDERLOS, KV_AVG_PAP, GRUNDFREIBETRAG, WKP,
 )
 from pdf_editor.ui import theme
@@ -74,9 +74,8 @@ class EinstellungenPage(QWidget):
                           f"letter-spacing:2px;padding-bottom:10px;border-bottom:1px solid {theme.C_BORDER};background:transparent;")
         bbg_l.addWidget(hh2)
         for lbl_txt, key, default in [
-            ("BBG KV/PV monatlich (€)",           "bbg_kv",      BBG_KV_2025),
-            ("BBG RV/AV West monatlich (€)",      "bbg_rv",      BBG_RV_2025),
-            ("BBG RV/AV Ost monatlich (€)",       "bbg_rv_ost",  7450.0),
+            ("BBG KV/PV monatlich (€)",           "bbg_kv",      BBG_KV_2026),
+            ("BBG RV/AV bundeseinheitlich (€)",   "bbg_rv",      BBG_RV_2026),
             ("Grundfreibetrag (€/Jahr)",           "grundfreibetrag", GRUNDFREIBETRAG),
             ("Werbungskostenpauschbetrag (€/Jahr)","wkp",         WKP),
             ("BMF-Durchschnitt KV-Zusatzbeitrag (%) [PAP]","kv_avg_pap", KV_AVG_PAP),
@@ -104,9 +103,8 @@ class EinstellungenPage(QWidget):
         """Persist to sv_calculator module-level overrides at runtime."""
         import pdf_editor.core.sv_calculator as sv_mod
         try:
-            sv_mod.BBG_KV_2025        = float(self._fields["bbg_kv"].text())
-            sv_mod.BBG_RV_2025        = float(self._fields["bbg_rv"].text())
-            sv_mod.BBG_RV_OST         = float(self._fields["bbg_rv_ost"].text())
+            sv_mod.BBG_KV_2026        = float(self._fields["bbg_kv"].text())
+            sv_mod.BBG_RV_2026        = float(self._fields["bbg_rv"].text())
             sv_mod.KV_BASIS           = float(self._fields["kv_basis"].text())
             sv_mod.PV_WEST            = float(self._fields["pv_west"].text())
             sv_mod.PV_SACHSEN_AN      = float(self._fields["pv_sach_an"].text())

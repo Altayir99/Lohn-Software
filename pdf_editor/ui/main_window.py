@@ -51,7 +51,7 @@ from pdf_editor.core.employee_store import (
     get_kum_vormonat, save_monat, MONAT_KEYS,
 )
 from pdf_editor.core.sv_calculator import (
-    calculate_sv, sum_lohnarten_betraege, BBG_KV_2025, BBG_RV_2025,
+    calculate_sv, sum_lohnarten_betraege, BBG_KV_2026, BBG_RV_2026,
 )
 from pdf_editor.ui.canvas import PDFCanvas
 from pdf_editor.ui.employee_list import EmployeeListPanel
@@ -2063,8 +2063,8 @@ class PDFEditor(QMainWindow):
         kk_pct       = _pf("kk_pct", "14,60")
         z_pct        = _pf("z_pct",  "3,50")
         pv_kz        = int(_pf("pv_kinder_kennzeichen", "0"))
-        bbg_kv       = float(self._user_values.get("bbg_kv", str(BBG_KV_2025)) or BBG_KV_2025)
-        bbg_rv       = float(self._user_values.get("bbg_rv", str(BBG_RV_2025)) or BBG_RV_2025)
+        bbg_kv       = float(self._user_values.get("bbg_kv", str(BBG_KV_2026)) or BBG_KV_2026)
+        bbg_rv       = float(self._user_values.get("bbg_rv", str(BBG_RV_2026)) or BBG_RV_2026)
 
         result = calculate_sv(brutto, kk_pct, z_pct, pv_kz, bbg_kv, bbg_rv)
 

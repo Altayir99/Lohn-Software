@@ -3,46 +3,53 @@ sv_calculator.py
 ================
 Full payroll calculation engine — BMF PAP 2026 + SV (§32a EStG, SGB IV/XI).
 
-Constants (2025/2026):
-    BBG KV/PV:  5.512,50 €/month
-    BBG RV/AV:  8.050,00 €/month  (West), 7.450 € (Ost)
+Constants (2026):
+    BBG KV/PV:  5.812,50 €/month
+    BBG RV/AV:  8.450,00 €/month (bundeseinheitlich)
     RV:  18,60 % (9,30 % AN)
     AV:   2,60 % (1,30 % AN)
     KV base: 14,60 %
-    PV:   3,60 % West (1,80 % AN), Sachsen AN: 2,30 %, AG: 1,30 %
+    PV:   3,60 % außerhalb Sachsens (1,80 % AN), Sachsen AN: 2,30 %, AG: 1,30 %
     PV kinderlos: +0,60 % AN
-    Grundfreibetrag: 11.784 €
+    Grundfreibetrag: 12.348 €
     WKP: 1.230 €/Jahr
     KV-Durchschnitt PAP: 2,90 %
+    SolZ-Freigrenze: 20.350 € Jahreslohnsteuer
+    Kinderfreibetragseinheit: 4.878 €
+    Minijob: bis 603,00 €; Midijob: 603,01–2.000,00 €
+    Minijob AG: KV 13 %, RV 15 %, Pauschsteuer 2 %, U1 0,80 %, U2 0,22 %,
+                Insolvenzgeldumlage 0,15 %
 """
 from __future__ import annotations
 from dataclasses import dataclass, field
 
-# ── 2025/2026 defaults ────────────────────────────────────────────────────────
-BBG_KV_2025   = 5_512.50
-BBG_RV_2025   = 8_050.00
-BBG_RV_OST    = 7_450.00
-KV_BASIS      = 14.60
-PV_WEST       = 3.60
-PV_SACHSEN_AN = 2.30
-PV_SACHSEN_AG = 1.30
-RV_SATZ       = 18.60
-AV_SATZ       = 2.60
-PV_KINDERLOS  = 0.60
-PV_BASE_AN    = 1.80
-GRUNDFREIBETRAG    = 11_784
-WKP                = 1_230
-KV_AVG_PAP        = 2.90   # BMF-Durchschnitt für Vorsorgepauschale
+# ── 2026 defaults ────────────────────────────────────────────────────────
+BBG_KV_2026   = 5_812.50  # source: https://www.bundesregierung.de/breg-de/suche/beitragsgemessungsgrenzen-2386514
+BBG_RV_2026   = 8_450.00  # source: https://www.bundesregierung.de/breg-de/suche/beitragsgemessungsgrenzen-2386514
+KV_BASIS      = 14.60     # source: https://www.bundesgesundheitsministerium.de/beitraege/seite
+PV_WEST       = 3.60      # source: https://www.bundesgesundheitsministerium.de/themen/pflege/online-ratgeber-pflege/die-pflegeversicherung/finanzierung
+PV_SACHSEN_AN = 2.30      # source: https://www.bundesgesundheitsministerium.de/themen/pflege/online-ratgeber-pflege/die-pflegeversicherung/finanzierung
+PV_SACHSEN_AG = 1.30      # source: https://www.bundesgesundheitsministerium.de/themen/pflege/online-ratgeber-pflege/die-pflegeversicherung/finanzierung
+RV_SATZ       = 18.60     # source: https://www.deutsche-rentenversicherung.de/DRV/DE/Experten/Zahlen-und-Fakten/Werte-der-Rentenversicherung/werte-der-rentenversicherung
+AV_SATZ       = 2.60      # source: https://www.deutsche-rentenversicherung.de/DRV/DE/Experten/Zahlen-und-Fakten/Werte-der-Rentenversicherung/werte-der-rentenversicherung
+PV_KINDERLOS  = 0.60      # source: https://www.bundesgesundheitsministerium.de/themen/pflege/online-ratgeber-pflege/die-pflegeversicherung/finanzierung
+PV_BASE_AN    = 1.80      # source: https://www.bundesgesundheitsministerium.de/themen/pflege/online-ratgeber-pflege/die-pflegeversicherung/finanzierung
+GRUNDFREIBETRAG = 12_348  # source: https://www.gesetze-im-internet.de/estg/__32a.html
+WKP              = 1_230  # source: https://www.gesetze-im-internet.de/estg/__9a.html
+KV_AVG_PAP       = 2.90   # source: https://www.bundesgesundheitsministerium.de/beitraege/seite
+SOLZ_FREIGRENZE  = 20_350  # source: https://www.gesetze-im-internet.de/solzg_1995/__3.html
+SOLZ_MILDERUNGSZONE_ENDE = 37_838.28125  # source: https://www.gesetze-im-internet.de/solzg_1995/__4.html
+KINDERFREIBETRAG_EINHEIT = 4_878  # source: https://www.bundesfinanzministerium.de/Content/DE/Downloads/Steuern/Steuerarten/Lohnsteuer/Programmablaufplan/2025-11-12-PAP-2026-anlage-1.pdf?__blob=publicationFile&v=2
 
-# ── Minijob / Midijob (Übergangsbereich) 2025/2026 ────────────────────────────
-MINIJOB_GRENZE     = 538.00
-MIDIJOB_GRENZE     = 2_000.00
-MINIJOB_KV_AG      = 13.0   # % AG-Pauschale KV
-MINIJOB_RV_AG      = 15.0   # % AG-Pauschale RV
-MINIJOB_PAUSCH_ST  = 2.0    # % Pauschale Lohnsteuer
-MINIJOB_U1         = 1.10   # % Umlage U1
-MINIJOB_U2         = 0.22   # % Umlage U2
-MINIJOB_INSOLVENZ  = 0.06   # % Insolvenzgeldumlage
+# ── Minijob / Midijob (Übergangsbereich) 2026 ────────────────────────────
+MINIJOB_GRENZE     = 603.00    # source: https://www.minijob-zentrale.de/DE/die-minijobs/minijob-mit-verdienstgrenze
+MIDIJOB_GRENZE     = 2_000.00  # source: https://www.minijob-zentrale.de/DE/die-minijobs/minijob-mit-verdienstgrenze
+MINIJOB_KV_AG      = 13.0      # source: https://magazin.minijob-zentrale.de/minijob-beitraege-2026/
+MINIJOB_RV_AG      = 15.0      # source: https://magazin.minijob-zentrale.de/minijob-beitraege-2026/
+MINIJOB_PAUSCH_ST  = 2.0       # source: https://magazin.minijob-zentrale.de/minijob-beitraege-2026/
+MINIJOB_U1         = 0.80      # source: https://magazin.minijob-zentrale.de/minijob-beitraege-2026/
+MINIJOB_U2         = 0.22      # source: https://magazin.minijob-zentrale.de/minijob-beitraege-2026/
+MINIJOB_INSOLVENZ  = 0.15      # source: https://magazin.minijob-zentrale.de/minijob-beitraege-2026/
 
 
 @dataclass
@@ -124,27 +131,28 @@ def _floor(x: float) -> float:
     import math
     return math.floor(x)
 
+# source: https://www.gesetze-im-internet.de/estg/__32a.html
 def _tarif_2026(x: float, gf: float = GRUNDFREIBETRAG) -> float:
     """§32a EStG Einkommensteuertarif 2026."""
     if x <= gf:
         return 0.0
-    if x <= 17_005:
+    if x <= 17_799:
         y = (x - gf) / 1e4
-        return _floor((922.98 * y + 1_400) * y)
-    if x <= 66_760:
-        y = (x - 17_005) / 1e4
-        return _floor((181.19 * y + 2_397) * y + 966.53)
+        return _floor((914.51 * y + 1_400) * y)
+    if x <= 69_878:
+        z = (x - 17_799) / 1e4
+        return _floor((173.10 * z + 2_397) * z + 1_034.87)
     if x <= 277_825:
-        return _floor(0.42 * x - 10_908.68)
-    return _floor(0.45 * x - 19_246.93)
+        return _floor(0.42 * x - 11_135.63)
+    return _floor(0.45 * x - 19_470.38)
 
 
 def _solz(lst_jahr: float) -> float:
-    """SolZ — Freigrenze §3 Abs.3 SolZG 1995 (2021+)."""
-    if lst_jahr <= 18_130:
+    """SolZ — Freigrenze and Milderungszone for 2026."""
+    if lst_jahr <= SOLZ_FREIGRENZE:
         return 0.0
-    raw = min(lst_jahr * 0.055, (lst_jahr - 18_130) * 0.119)
-    if lst_jahr >= 25_372:
+    raw = min(lst_jahr * 0.055, (lst_jahr - SOLZ_FREIGRENZE) * 0.119)
+    if lst_jahr >= SOLZ_MILDERUNGSZONE_ENDE:
         raw = lst_jahr * 0.055
     return _floor(raw)
 
@@ -158,8 +166,8 @@ def _pap2026(
     pvz:       bool    = False,   # kinderlos
     pvs:       bool    = False,   # Sachsen
     rv_an:     bool    = True,
-    bbg_kv_j:  float   = BBG_KV_2025 * 12,
-    bbg_rv_j:  float   = BBG_RV_2025 * 12,
+    bbg_kv_j:  float   = BBG_KV_2026 * 12,
+    bbg_rv_j:  float   = BBG_RV_2026 * 12,
     kv_avg:    float   = KV_AVG_PAP,
     gf:        float   = GRUNDFREIBETRAG,
     wkp:       float   = WKP,
@@ -186,7 +194,7 @@ def _pap2026(
 
     wkp_a = wkp if stkl in (1, 2, 3, 4) else 0
     sap   = 72 if stkl == 3 else (36 if stkl in (1, 2, 4) else 0)
-    kfb_e = kfb * 4_656
+    kfb_e = kfb * KINDERFREIBETRAG_EINHEIT
 
     zve = max(0, _floor(jre4 - wkp_a - sap - vps - kfb_e - jfreib + jhinzu))
 
@@ -234,7 +242,7 @@ def _fuenftel(
 
     z5 = max(0, _floor(zve_base + einmal / 5))
     lst_sb = max(0, (_lst_sk(z5) - _lst_sk(zve_base)) * 5)
-    solz_sb = _solz(lst_sb) if lst_sb > 18_130 else 0.0
+    solz_sb = _solz(lst_sb) if lst_sb > SOLZ_FREIGRENZE else 0.0
     return lst_sb, solz_sb
 
 
@@ -260,8 +268,8 @@ def calculate_full(
     vwl_ag:        float = 0.0,
     vorschuss:     float = 0.0,
     vwl_an:        float = 0.0,
-    bbg_kv:        float = BBG_KV_2025,
-    bbg_rv:        float = BBG_RV_2025,
+    bbg_kv:        float = BBG_KV_2026,
+    bbg_rv:        float = BBG_RV_2026,
     kv_avg:        float = KV_AVG_PAP,
     gf:            float = GRUNDFREIBETRAG,
     wkp:           float = WKP,
@@ -274,8 +282,6 @@ def calculate_full(
     """
     pvz = pv_kinderlos
     pvs = bundesland == "sachsen"
-    if bundesland == "ost":
-        bbg_rv = BBG_RV_OST
 
     lfd_b     = grundgehalt + ueberstunden + sachbezug
     gesamt_b  = lfd_b + einmalzahlung + fahrgeld + vwl_ag
@@ -464,7 +470,7 @@ def calculate_full(
 # ── Legacy helpers (kept for backward compat) ─────────────────────────────────
 
 def calculate_sv(brutto, kk_pct, z_pct, pv_kinder_kz,
-                 bbg_kv=BBG_KV_2025, bbg_rv=BBG_RV_2025):
+                 bbg_kv=BBG_KV_2026, bbg_rv=BBG_RV_2026):
     """Legacy: SV-only calculation (used by older calc panel path)."""
     r = calculate_full(
         grundgehalt=brutto, kk_pct=kk_pct, z_pct=z_pct,

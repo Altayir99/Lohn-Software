@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import (
 from pdf_editor.core.employee_store import (
     DEFAULT_STORE_DIR, save_employee, load_employee,
 )
-from pdf_editor.core.sv_calculator import BBG_KV_2025, BBG_RV_2025
+from pdf_editor.core.sv_calculator import BBG_KV_2026, BBG_RV_2026
 from pdf_editor.ui import theme
 
 # ── Style constants (derived from theme) ─────────────────────────────────────
@@ -292,16 +292,16 @@ class EmployeeForm(QDialog):
         bl.addLayout(g)
 
         # ── BBG & KK-Satz ────────────────────────────────────────────────
-        bl.addWidget(_section("BBG & KK-SATZ (2025)"))
+        bl.addWidget(_section("BBG & KK-SATZ (2026)"))
         g2 = QGridLayout()
         g2.setSpacing(8)
         g2.setColumnStretch(0, 1)
         g2.setColumnStretch(1, 1)
         self._add_field(g2, 0, 0, "KK-Satz gesamt % (KV)", "kk_pct", "14,60")
-        self._add_field(g2, 0, 1, "BBG KV/PV (€/mtl)",     "bbg_kv", f"{BBG_KV_2025:.2f}")
-        self._add_field(g2, 1, 0, "BBG RV/AV (€/mtl)",     "bbg_rv", f"{BBG_RV_2025:.2f}")
+        self._add_field(g2, 0, 1, "BBG KV/PV (€/mtl)",     "bbg_kv", f"{BBG_KV_2026:.2f}")
+        self._add_field(g2, 1, 0, "BBG RV/AV (€/mtl)",     "bbg_rv", f"{BBG_RV_2026:.2f}")
         bl.addLayout(g2)
-        bl.addWidget(_hint("Diese Werte werden jährlich angepasst (Stand 2025)."))
+        bl.addWidget(_hint("Diese Werte werden jährlich angepasst (Stand 2026)."))
 
         # ── Bank ─────────────────────────────────────────────────────────
         bl.addWidget(_section("BANK"))
@@ -445,8 +445,8 @@ class EmployeeForm(QDialog):
 
         # Defaults for KK if not in advanced
         data.setdefault("kk_pct",  "14,60")
-        data.setdefault("bbg_kv",  str(BBG_KV_2025))
-        data.setdefault("bbg_rv",  str(BBG_RV_2025))
+        data.setdefault("bbg_kv",  str(BBG_KV_2026))
+        data.setdefault("bbg_rv",  str(BBG_RV_2026))
         data.setdefault("wochenstunden", "40")
         data.setdefault("urlaubstage", "28")
 
